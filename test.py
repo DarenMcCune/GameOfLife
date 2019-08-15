@@ -1,7 +1,10 @@
-import numpy as np
-import algorithm as algo
+import http.server
+import socketserver
 
-x=np.array([[0,0,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0],[0,0,0,0,0]], dtype=np.bool)
-for i in range(10):
-    print x
-    x=algo.tick(x)
+PORT = 8000
+
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
