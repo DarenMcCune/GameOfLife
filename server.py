@@ -12,6 +12,10 @@ class getBoard:
     #TODO Get info about the current board state
     pass
 
-class play_pause:
+class play:
     #TODO Handle play_pause_events
+    pass
+
+class pause:
+    #TODO
     pass
