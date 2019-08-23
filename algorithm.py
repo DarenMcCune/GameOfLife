@@ -7,7 +7,6 @@ class Game:
         self.PHYSICAL_BOARD_WIDTH = width
         self.PHYSICAL_BOARD_HEIGHT = height
         self.physical_board_top_left=[0, 0]
-        self.playing=False
         self.board=np.zeros((self.width, self.height), dtype=bool)
 
     def _sum_neighbors(self):
@@ -20,20 +19,13 @@ class Game:
         return out
 
     def tick(self):
-
-        if(self.playing):
-            self.update_virtual_board()
-            neighbors=self._sum_neighbors()
-            survivors=(neighbors<4) & (neighbors>1) & self.board
-            newbies=(self.board==0) & (neighbors==3)
-            self.board=(survivors|newbies)
-
-        else:
-            raise ValueError("Attempted to advance the game state when paused")
+        self.update_virtual_board()
+        neighbors=self._sum_neighbors()
+        survivors=(neighbors<4) & (neighbors>1) & self.board
+        newbies=(self.board==0) & (neighbors==3)
+        self.board=(survivors|newbies)
 
     def flip_physical_board_cell(self, cell):
-        if(self.playing):
-            raise ValueError("Attempted to flip a cell while the game was in session")
         if(cell>=self.PHYSICAL_BOARD_HEIGHT*self.PHYSICAL_BOARD_WIDTH):
             raise ValueError("cell falls out of bounds of the physical")
         row, col=self._get_virtual_board_indices_from_physical_cell(cell)
@@ -48,14 +40,15 @@ class Game:
         return row, col
 
     def _get_physical_board(self):
+        # Risks rep exposure, but within the context it's meant to be used I think that's fine
         return self.board[self.physical_board_top_left[0]: self.physical_board_top_left[0]+self.PHYSICAL_BOARD_HEIGHT, self.physical_board_top_left[1]: self.physical_board_top_left[1]+self.PHYSICAL_BOARD_WIDTH]
 
     def update_virtual_board(self):
-        #This function needs to do 3 things(None of them if virtual board size doesn't change: Update virtual board size
-        #move the location of the physical board's top left corner, and copy the former board's data values to the correct
-        #location
+        # This function needs to do 3 things(None of them if virtual board size doesn't change: Update virtual board
+        # size move the location of the physical board's top left corner, and copy the former board's data values to the
+        # correct location
 
-        #Check if their are any active cells on any of the borders.
+        # Check if their are any active cells on any of the borders.
         row_sum=np.sum(self.board, axis=1)
         col_sum=np.sum(self.board, axis=0)
         # The only thing that matters is whether or not their are active cells on the border, not how many their are,
@@ -83,7 +76,7 @@ class Game:
         if(left_col):
             self.physical_board_top_left[1]+=self.width
 
-        #finally, embed the old board in the new board and update self.board, self.width and self.height
+        # Finally, embed the old board in the new board and update self.board, self.width and self.height
         old_board_x=self.width*left_col
         old_board_y=self.height*top_row
         new_board[old_board_y: old_board_y+self.height, old_board_x:old_board_x+self.width]=self.board
