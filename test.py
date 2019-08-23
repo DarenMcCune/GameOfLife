@@ -1,10 +1,15 @@
-import http.server
-import socketserver
+from algorithm import Game
+x=Game(8, 8)
+for cell in [0,33, 34, 41, 42]:
+    x.flip_physical_board_cell(cell)
+print x.board.astype(int)
 
-PORT = 8000
-
-Handler = http.server.SimpleHTTPRequestHandler
-
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print("serving at port", PORT)
-    httpd.serve_forever()
+x.playing=True
+for i in range(10):
+    print "continue ##########################"
+    #raw_input("continue? ")
+    x.tick()
+    print "virtual board:"
+    print x.board.astype(int)
+    print "Physical:"
+    print x._get_physical_board().astype(int)
